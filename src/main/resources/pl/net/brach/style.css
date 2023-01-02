@@ -1,0 +1,9 @@
+.text-field {
+    -fx-font-family: "Calibri";
+    -fx-font-size: 20px;
+}
+
+.combo-box{
+    -fx-font-family: "Calibri";
+    -fx-font-size: 18px;
+}
