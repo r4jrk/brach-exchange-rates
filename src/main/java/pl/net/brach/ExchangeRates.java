@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 public class ExchangeRates extends Application {
     
     static final String BRACHSOFT_TITLE = "BRACHSoft - Kursy walut v.1.2";
-    static final String ICON_PATH = "pl/net/brach/brachlogo.png";
+    static final String ICON_PATH = "pl/net/brach/brachicon.png";
     static final String STYLE_PATH = "pl/net/brach/style.css";
 
     static final String PRINTER_NAME = "Xprinter XP-350B";
