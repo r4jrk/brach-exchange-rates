@@ -19,91 +19,84 @@
 
 <BorderPane prefHeight="276.0"
             prefWidth="414.0"
+            stylesheets="@style.css"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="pl.net.brach.MainWindowController">
    <top>
       <HBox alignment="CENTER" prefHeight="60.0" prefWidth="380.0" BorderPane.alignment="CENTER">
-         <children>
-            <Pane prefHeight="200.0" prefWidth="80.0" />
-            <!--ImageView fx:id="logoBrach"-->
-            <ImageView
-                       fitHeight="50.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image fx:id="brachLogo" url="@brachlogo.png" />
-               </image>
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
-            </ImageView>
-            <Label alignment="CENTER" prefHeight="35.0" prefWidth="278.0" text="Kursy walut">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Label>
-            <Pane prefWidth="40.0" />
-         </children>
+         <Pane prefHeight="200.0" prefWidth="80.0" />
+         <ImageView fitHeight="50.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true">
+            <cursor>
+               <Cursor fx:constant="DEFAULT" />
+            </cursor>
+            <Image url="@brachlogo.png" />
+         </ImageView>
+         <Label id="lMainHeader" alignment="CENTER" prefHeight="35.0" prefWidth="278.0" text="Kursy walut">
+            <font>
+               <Font size="24.0" />
+            </font>
+         </Label>
+         <Pane prefWidth="40.0" />
       </HBox>
    </top>
    <center>
       <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Label layoutX="3.0" layoutY="14.0" text="Wartość transakcji:">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </Label>
-            <Label layoutX="3.0" layoutY="94.0" text="Data transakcji:">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </Label>
-            <Button fx:id="bOK" layoutX="38.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#okClicked" prefHeight="30.0" prefWidth="130.0" text="OK" />
-            <Button fx:id="bClose" layoutX="209.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#closeClicked" prefHeight="30.0" prefWidth="130.0" text="Zamknij" />
-            <ComboBox fx:id="cbCurrencies" layoutX="226.0" layoutY="50.0" minHeight="34.0" onAction="#currencyChosen" prefHeight="34.0" prefWidth="150.0">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Item 1" />
-                        <String fx:value="Item 2" />
-                        <String fx:value="Item 3" />
-                    </FXCollections>
-                </items>
-            </ComboBox>
-            <TextField fx:id="tbTransactionAmount" layoutX="226.0" layoutY="10.0" minHeight="34.0" prefHeight="34.0" prefWidth="150.0">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </TextField>
-            <DatePicker fx:id="dpTransactionDate" layoutX="226.0" layoutY="90.0" minHeight="34.0" prefHeight="34.0" prefWidth="150.0" />
-            <RadioButton fx:id="rbPrint" layoutX="14.0" layoutY="134.0" mnemonicParsing="false" text="Drukuj">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </RadioButton>
-            <Label layoutX="3.0" layoutY="54.0" text="Waluta:">
-               <font>
-                  <Font size="20.0" />
-               </font>
-            </Label>
-            <RadioButton fx:id="rbVAT" layoutX="137.0" layoutY="134.0" mnemonicParsing="false" text="VAT" selected="true">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </RadioButton>
-            <ComboBox fx:id="cbVAT" layoutX="226.0" layoutY="130.0" minHeight="34.0" onAction="#vatRateChosen" prefHeight="34.0" prefWidth="150.0">
-               <items>
-                  <FXCollections fx:factory="observableArrayList">
-                     <String fx:value="Item 1" />
-                     <String fx:value="Item 2" />
-                     <String fx:value="Item 3" />
-                  </FXCollections>
-               </items>
-            </ComboBox>
-         </children>
+         <Label layoutX="3.0" layoutY="14.0" text="Wartość transakcji:">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <Label layoutX="3.0" layoutY="94.0" text="Data transakcji:">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <Button id="bOK" layoutX="38.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#okClicked" prefHeight="30.0" prefWidth="130.0" text="OK" />
+         <Button fx:id="bClose" layoutX="209.0" layoutY="174.0" mnemonicParsing="false" onMouseClicked="#closeClicked" prefHeight="30.0" prefWidth="130.0" text="Zamknij" />
+         <ComboBox fx:id="cbCurrencies" layoutX="226.0" layoutY="50.0" minHeight="34.0" onAction="#currencyChosen" prefHeight="34.0" prefWidth="162.0">
+            <items>
+               <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Item 1" />
+                  <String fx:value="Item 2" />
+                  <String fx:value="Item 3" />
+               </FXCollections>
+            </items>
+         </ComboBox>
+         <TextField fx:id="tbTransactionAmount" layoutX="226.0" layoutY="10.0" minHeight="34.0" prefHeight="34.0" prefWidth="162.0">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </TextField>
+         <DatePicker fx:id="dpTransactionDate" layoutX="226.0" layoutY="90.0" minHeight="34.0" prefHeight="34.0" prefWidth="162.0" />
+         <RadioButton fx:id="rbPrint" layoutX="14.0" layoutY="134.0" mnemonicParsing="false" text="Drukuj">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </RadioButton>
+         <Label layoutX="3.0" layoutY="54.0" text="Waluta:">
+            <font>
+               <Font size="20.0" />
+            </font>
+         </Label>
+         <RadioButton fx:id="rbVAT" layoutX="137.0" layoutY="134.0" mnemonicParsing="false" selected="true" text="VAT">
+            <font>
+               <Font size="18.0" />
+            </font>
+         </RadioButton>
+         <ComboBox fx:id="cbVAT" layoutX="226.0" layoutY="130.0" minHeight="34.0" onAction="#vatRateChosen" prefHeight="34.0" prefWidth="162.0">
+            <items>
+               <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Item 1" />
+                  <String fx:value="Item 2" />
+                  <String fx:value="Item 3" />
+               </FXCollections>
+            </items>
+         </ComboBox>
       </AnchorPane>
    </center>
    <bottom>
-      <Label fx:id="copyrightLabel" onMouseEntered="#copyEmail" opacity="0.2" prefHeight="17.0" prefWidth="400.0" text=" Copyright © 2019 Rafał Jurek - jurek.rafal@outlook.com" BorderPane.alignment="CENTER" />
+      <Label id="lFooter" opacity="0.2" prefHeight="17.0" prefWidth="400.0" text=" Copyright © 2019 Rafał Jurek - jurek.rafal@outlook.com" BorderPane.alignment="CENTER" />
    </bottom>
    <left>
       <AnchorPane prefHeight="200.0" prefWidth="19.0" BorderPane.alignment="CENTER" />

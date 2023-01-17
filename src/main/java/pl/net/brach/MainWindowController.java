@@ -1,72 +1,53 @@
 package pl.net.brach;
 
-
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-
 import java.io.*;
-
 import java.net.*;
-
 import java.text.DecimalFormat;
-
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-
 import java.util.*;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.fxml.FXMLLoader;
-
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 import javafx.stage.Stage;
-
 import javafx.util.StringConverter;
-
 import javax.print.*;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 
 public class MainWindowController implements Initializable {
 
-    private static final String BRACHSOFT_SUMMARY_TITLE = ExchangeRates.BRACHSOFT_TITLE + " - Podsumowanie";
-
     private static final List<String> DATA_FORMATS = Arrays.asList("dd-MM-yyyy", "dd/MM/yyyy", "ddMMyyyy", "dd.MM.yyyy",
             "yyyy-MM-dd", "yyyy/MM/dd", "yyyyMMdd", "yyyy.MM.dd");
-    private static final String LABEL_FILE_PATH = "C:/Temp/Kursy.txt";
-    private static final String SUMMARY_POPUP_FILE_NAME = "Summary.fxml";
 
     private static final String NBP_API_LINK = "http://api.nbp.pl/api/exchangerates/rates/a/";
     private static final int NBP_API_RETRY_COUNT = 30;
     private static final DateTimeFormatter NBP_API_DATA_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
 
-    //FXML fields
-    public Button bOK;
-    public Button bClose;
-    public RadioButton rbPrint;
-    public RadioButton rbVAT;
-    public TextField tbTransactionAmount;
-    public DatePicker dpTransactionDate;
-    public ComboBox<String> cbCurrencies;
-    public ComboBox<String> cbVAT;
-    public Label copyrightLabel;
+    @FXML
+    private Button bClose;
+    @FXML
+    private RadioButton rbPrint;
+    @FXML
+    private RadioButton rbVAT;
+    @FXML
+    private TextField tbTransactionAmount;
+    @FXML
+    private DatePicker dpTransactionDate;
+    @FXML
+    private ComboBox<String> cbCurrencies;
+    @FXML
+    private ComboBox<String> cbVAT;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -138,36 +119,27 @@ public class MainWindowController implements Initializable {
     }
 
     private void addCurrenciesToComboBox() {
+        Currency currency = new Currency();
+
         cbCurrencies.getItems().clear();
-        cbCurrencies.getItems().addAll(ExchangeRates.AVAILABLE_CURRENCIES);
+        cbCurrencies.getItems().addAll(currency.getCurrencies());
         cbCurrencies.getSelectionModel().selectFirst();
     }
 
     private void addVATRatesToComboBox() {
+        VAT vat = new VAT();
+
         cbVAT.getItems().clear();
-        cbVAT.getItems().addAll(ExchangeRates.AVAILABLE_VAT_RATES);
+        cbVAT.getItems().addAll(vat.getVatRates());
         cbVAT.getSelectionModel().selectFirst();
     }
 
     @FXML
-    private void currencyChosen() {
-        cbCurrencies.getSelectionModel().select(cbCurrencies.getSelectionModel().getSelectedItem());
-    }
+    private void currencyChosen() { cbCurrencies.getSelectionModel().select(cbCurrencies.getSelectionModel().getSelectedItem()); }
 
     @FXML
     private void vatRateChosen() {
         cbVAT.getSelectionModel().select(cbVAT.getSelectionModel().getSelectedItem());
-    }
-
-    private LocalDate extractTransactionDate() {
-        LocalDate dTransactionDate = null;
-        for (String pattern : DATA_FORMATS) {
-            try {
-                dTransactionDate = LocalDate.parse(dpTransactionDate.getEditor().getText(), DateTimeFormatter.ofPattern(pattern));
-            } catch (DateTimeParseException ignored) {
-            }
-        }
-        return dTransactionDate;
     }
 
     @FXML
@@ -181,37 +153,46 @@ public class MainWindowController implements Initializable {
             String fetchedTransactionData = getData(dTransactionDate, cbCurrencies.getValue());
 
             String transactionExchangeRatesTableNumber = getTableNumber(fetchedTransactionData);
-            String transactionExchangeRatesTableDate = getDay(fetchedTransactionData);
+            String transactionExchangeRatesTableDate = gateDate(fetchedTransactionData);
             String transactionExchangeRatesTransactionRate = getRate(fetchedTransactionData);
             double calculatedTransactionValue = calculateAmount(transactionExchangeRatesTransactionRate);
 
-            String[] parameters;
+            String[] params;
             double vat;
             DecimalFormat format = new DecimalFormat("###,##0.00");
 
             if (rbVAT.isSelected()) {
                 vat = calculateVAT(calculatedTransactionValue);
-                parameters = new String[6];
-                parameters[5] = format.format(vat) + " zł";
+                params = new String[6];
+                params[5] = format.format(vat) + " zł";
             } else {
-                parameters = new String[5];
+                params = new String[5];
             }
 
-            parameters[0] = format.format(Double.parseDouble(tbTransactionAmount.getText().replace(",", ".")))
+            params[0] = format.format(Double.parseDouble(tbTransactionAmount.getText().replace(",", ".")))
                     + " " + cbCurrencies.getValue();
-            parameters[1] = transactionExchangeRatesTableNumber;
-            parameters[2] = transactionExchangeRatesTableDate;
-            parameters[3] = transactionExchangeRatesTransactionRate.replace(".", ",");
-            parameters[4] = format.format(calculatedTransactionValue) + " zł";
+            params[1] = transactionExchangeRatesTableNumber;
+            params[2] = transactionExchangeRatesTableDate;
+            params[3] = transactionExchangeRatesTransactionRate.replace(".", ",");
+            params[4] = format.format(calculatedTransactionValue) + " zł";
 
             if (rbPrint.isSelected()) {
-                ArrayList<String> labelText = generateLabel(parameters);
-                //saveToLabelFile(labelText);
+                ArrayList<String> labelText = generateLabel(params);
                 printLabel(labelText);
             }
 
-            showSummary(parameters);
+            ExchangeRates.displaySummary(params);
         }
+    }
+
+    private LocalDate extractTransactionDate() {
+        LocalDate dTransactionDate = null;
+        for (String pattern : DATA_FORMATS) {
+            try {
+                dTransactionDate = LocalDate.parse(dpTransactionDate.getEditor().getText(), DateTimeFormatter.ofPattern(pattern));
+            } catch (DateTimeParseException ignored) { }
+        }
+        return dTransactionDate;
     }
 
     private String getData(LocalDate dData, String sCurrencyInput) throws IOException {
@@ -245,17 +226,17 @@ public class MainWindowController implements Initializable {
         return dataFetched;
     }
 
-    private static String getTableNumber(String sDane) {
-        return sDane.substring(sDane.indexOf("no") + 5, sDane.indexOf("[") + 22);
+    private static String getTableNumber(String sData) {
+        return sData.substring(sData.indexOf("no") + 5, sData.indexOf("[") + 22);
     }
 
-    private static String getDay(String sDane) {
-        return sDane.substring(sDane.indexOf("effectiveDate") + 16, sDane.indexOf("[") + 51);
+    private static String gateDate(String sData) {
+        return sData.substring(sData.indexOf("effectiveDate") + 16, sData.indexOf("[") + 51);
     }
 
-    private String getRate(String sDane) {
+    private String getRate(String sData) {
         //Check if the currency is not in 1/100 PLN and adjust if necessary
-        String sRate = sDane.substring(sDane.indexOf("mid") + 5, sDane.indexOf("[") + 67);
+        String sRate = sData.substring(sData.indexOf("mid") + 5, sData.indexOf("[") + 67);
         if (sRate.charAt(sRate.length() - 1) == ']') {
             sRate = sRate.substring(0, sRate.length() - 1);
         }
@@ -273,25 +254,6 @@ public class MainWindowController implements Initializable {
     private double calculateVAT(double calculatedTransactionValue) {
         return (Double.parseDouble(cbVAT.getValue().replace("%", ""))
                 * calculatedTransactionValue) / 100;
-    }
-
-    private void showSummary(String[] params) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource(SUMMARY_POPUP_FILE_NAME));
-        Pane root = fxmlLoader.load();
-
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(ExchangeRates.STYLE_PATH);
-
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.setTitle(BRACHSOFT_SUMMARY_TITLE);
-        stage.getIcons().add(new Image(ExchangeRates.ICON_PATH));
-
-        SummaryController controller = fxmlLoader.getController();
-        controller.generateSummary(params);
-
-        stage.setResizable(false);
-        stage.show();
     }
 
     private ArrayList<String> generateLabel(String[] args) {
@@ -338,71 +300,14 @@ public class MainWindowController implements Initializable {
 
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
-        if (!printerJob.getPrintService().getName().equals(ExchangeRates.PRINTER_NAME)) {
-            printerJob.setPrintService(getPrintService(ExchangeRates.PRINTER_NAME));
+        if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
+            printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
+        } else {
+            printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
         }
 
         printerJob.setPrintable(new LabelPrint(stringArrayListToPrint));
         printerJob.print(pras);
-    }
-
-    private void saveToLabelFile(String[] labelText) throws IOException {
-        File tempFile = new File(LABEL_FILE_PATH);
-
-        boolean directoryCreated = false;
-
-        File directoryFile = tempFile.getParentFile();
-
-        if (!directoryFile.exists()) {
-            directoryCreated = directoryFile.mkdir();
-        }
-
-        if (directoryCreated) {
-            System.out.println("Directory: " + directoryFile.getAbsolutePath() + " created");
-        }
-
-        try (
-                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-            for (String stringToBeSaved : labelText) {
-                writer.write(stringToBeSaved + System.lineSeparator());
-            }
-        }
-    }
-
-    private String readFromLabelFile() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(LABEL_FILE_PATH));
-        StringBuilder stringBuilder = new StringBuilder();
-
-        String textLine = bufferedReader.readLine();
-
-        while (textLine != null) {
-            stringBuilder.append(textLine);
-            stringBuilder.append(System.lineSeparator());
-            textLine = bufferedReader.readLine();
-        }
-
-        return stringBuilder.toString();
-    }
-
-    private static DocPrintJob getPrinterJob(String printerName) {
-        DocPrintJob job = null;
-        PrintService[] services = PrinterJob.lookupPrintServices();
-
-        for (PrintService printService : services) {
-            if (printService.getName().equals(printerName)) {
-                job = printService.createPrintJob();
-            }
-        }
-        return job;
-    }
-
-    @FXML
-    private void copyEmail() {
-        Tooltip tooltip = new Tooltip();
-        tooltip.setText("Skopiowano adres e-mail");
-        StringSelection selection = new StringSelection("jurek.rafal@outlook.com");
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-        copyrightLabel.setTooltip(tooltip);
     }
 
     @FXML

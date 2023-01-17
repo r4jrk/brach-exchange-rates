@@ -20,8 +20,7 @@ public class SummaryController implements Initializable {
     private static final double BUTTON_CLOSE_POSITION_VERTICAL = 177.0;
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.ENGLISH);
 
-    @FXML
-    private Button bClose;
+    public Button bClose;
     public Label transactionTableNumber;
     public Label transactionRateDate;
     public Label transactionAmount;

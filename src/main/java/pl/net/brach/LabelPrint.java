@@ -15,7 +15,7 @@ public class LabelPrint implements Printable {
     static final float PRINT_PAGE_HEIGHT = 60;
     static final float PRINT_PAGE_WIDTH = 80;
 
-    ArrayList<String> labelText;
+    private final ArrayList<String> labelText;
 
     public LabelPrint(ArrayList<String> labelText) {
         this.labelText = labelText;

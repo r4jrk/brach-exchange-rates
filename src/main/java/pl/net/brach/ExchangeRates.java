@@ -1,14 +1,12 @@
 package pl.net.brach;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class ExchangeRates extends Application {
@@ -17,9 +15,12 @@ public class ExchangeRates extends Application {
     static final String ICON_PATH = "pl/net/brach/brachicon.png";
     static final String STYLE_PATH = "pl/net/brach/style.css";
 
-    static final String PRINTER_NAME = "Xprinter XP-350B";
-    static final List<String> AVAILABLE_CURRENCIES = Arrays.asList("EUR", "USD", "CHF", "GBP", "CZK", "RON", "HUF");
-    static final List<String> AVAILABLE_VAT_RATES = Arrays.asList("23%", "8%", "5%");
+    static final String PRIMARY_PRINTER_NAME = "Xprinter XP-350B";
+    static final String SECONDARY_PRINTER_NAME = "Xprinter XP-420B";
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,7 +37,23 @@ public class ExchangeRates extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    protected static void displaySummary(String[] args) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(ExchangeRates.class.getResource("Summary.fxml"));
+        Pane root = fxmlLoader.load();
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(STYLE_PATH);
+
+        Stage stage = new Stage();
+
+        stage.setTitle(BRACHSOFT_TITLE + " - Podsumowanie");
+        stage.getIcons().add(new Image(ICON_PATH));
+        stage.setScene(scene);
+        stage.setResizable(false);
+
+        SummaryController summaryController = fxmlLoader.getController();
+        summaryController.generateSummary(args);
+
+        stage.show();
     }
 }
