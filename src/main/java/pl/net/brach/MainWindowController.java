@@ -227,7 +227,12 @@ public class MainWindowController implements Initializable {
     }
 
     private static String getTableNumber(String sData) {
-        return sData.substring(sData.indexOf("no") + 5, sData.indexOf("[") + 22);
+        //VERY dirty workaround for NOKs ONLY. That whole stuff (fetching data, etc.) should be rebuilt to handle JSONs properly
+        if (sData.indexOf("no") == 32) {
+            return sData.substring(sData.indexOf("no") + 39, sData.indexOf("[") + 22);
+        } else {
+            return sData.substring(sData.indexOf("no") + 5, sData.indexOf("[") + 22);
+        }
     }
 
     private static String gateDate(String sData) {
