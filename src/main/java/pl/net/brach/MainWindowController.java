@@ -305,9 +305,13 @@ public class MainWindowController implements Initializable {
 
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
-        if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
-            printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
-        } else {
+        try {
+            if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
+                printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
+            } else {
+                printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
+            }
+        } catch (Exception ex) {
             printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
         }
 
