@@ -1,6 +1,5 @@
 package pl.net.brach;
 
-import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.*;
 import java.net.*;
@@ -143,7 +142,7 @@ public class MainWindowController implements Initializable {
     }
 
     @FXML
-    private void okClicked() throws IOException, PrinterException {
+    private void okClicked() throws IOException {
         //Get user input data
         if (dpTransactionDate.getEditor().getText().equals("")) {
             System.out.println("No data was provided. Aborting...");
@@ -297,7 +296,7 @@ public class MainWindowController implements Initializable {
         return printService;
     }
 
-    private void printLabel(ArrayList<String> stringArrayListToPrint) throws PrinterException {
+    private void printLabel(ArrayList<String> stringArrayListToPrint) {
         PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
         pras.add(OrientationRequested.PORTRAIT);
         pras.add(new MediaPrintableArea(0, 0, LabelPrint.PRINT_PAGE_HEIGHT, LabelPrint.PRINT_PAGE_WIDTH, MediaPrintableArea.MM));
@@ -305,18 +304,32 @@ public class MainWindowController implements Initializable {
 
         PrinterJob printerJob = PrinterJob.getPrinterJob();
 
-        try {
-            if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
+        if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
+            try {
+                System.out.println("Trying to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
                 printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
-            } else {
-                printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
+                System.out.println("Successfully set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
+            } catch (Exception ex) {
+                System.out.println("Failed to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
             }
-        } catch (Exception ex) {
-            printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
+        } else {
+            try {
+                System.out.println("Trying to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+                printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
+                System.out.println("Successfully set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+            } catch (Exception ex) {
+                System.out.println("Failed to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+            }
         }
 
         printerJob.setPrintable(new LabelPrint(stringArrayListToPrint));
-        printerJob.print(pras);
+        try {
+            printerJob.print(pras);
+            System.out.println("Label sent to printer: " + printerJob.getPrintService().getName());
+        } catch (Exception ex) {
+            System.out.println(ex);
+            System.out.println("Failed to print label on: " + printerJob.getPrintService().getName());
+        }
     }
 
     @FXML
