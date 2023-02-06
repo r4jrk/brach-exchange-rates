@@ -303,32 +303,38 @@ public class MainWindowController implements Initializable {
         pras.add(new JobName(ExchangeRates.BRACHSOFT_TITLE + " - Dokument", null));
 
         PrinterJob printerJob = PrinterJob.getPrinterJob();
+        String printServiceName = printerJob.getPrintService().getName();
+        boolean isSetPrintServiceSuccess = false;
 
-        if (printerJob.getPrintService().getName().equals(ExchangeRates.PRIMARY_PRINTER_NAME)) {
-            try {
-                System.out.println("Trying to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
-                printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
-                System.out.println("Successfully set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
-            } catch (Exception ex) {
-                System.out.println("Failed to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
-            }
-        } else {
-            try {
-                System.out.println("Trying to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
-                printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
-                System.out.println("Successfully set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
-            } catch (Exception ex) {
-                System.out.println("Failed to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
-            }
+        try {
+            System.out.println("Trying to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
+            printerJob.setPrintService(getPrintService(ExchangeRates.PRIMARY_PRINTER_NAME));
+            isSetPrintServiceSuccess = true;
+            System.out.println("Successfully set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
+        } catch (Exception ex) {
+            System.out.println("Failed to set print service to: " + ExchangeRates.PRIMARY_PRINTER_NAME);
         }
 
-        printerJob.setPrintable(new LabelPrint(stringArrayListToPrint));
         try {
-            printerJob.print(pras);
-            System.out.println("Label sent to printer: " + printerJob.getPrintService().getName());
+            System.out.println("Trying to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+            printerJob.setPrintService(getPrintService(ExchangeRates.SECONDARY_PRINTER_NAME));
+            isSetPrintServiceSuccess = true;
+            System.out.println("Successfully set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+        } catch (Exception ex) {
+            System.out.println("Failed to set print service to: " + ExchangeRates.SECONDARY_PRINTER_NAME);
+        }
+
+        try {
+            if (isSetPrintServiceSuccess) {
+                printerJob.setPrintable(new LabelPrint(stringArrayListToPrint));
+                printerJob.print(pras);
+                System.out.println("Label sent to printer: " + printServiceName);
+            } else {
+                System.out.println("Failed to print label on: " + printServiceName);
+            }
         } catch (Exception ex) {
             System.out.println(ex);
-            System.out.println("Failed to print label on: " + printerJob.getPrintService().getName());
+            System.out.println("Failed to print label on: " + printServiceName);
         }
     }
 
