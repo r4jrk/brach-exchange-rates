@@ -144,7 +144,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private void okClicked() throws IOException {
         //Get user input data
-        if (dpTransactionDate.getEditor().getText().equals("")) {
+        if (dpTransactionDate.getEditor().getText().isEmpty()) {
             System.out.println("No data was provided. Aborting...");
         } else {
             LocalDate dTransactionDate = extractTransactionDate();
@@ -154,16 +154,17 @@ public class MainWindowController implements Initializable {
             String transactionExchangeRatesTableNumber = getTableNumber(fetchedTransactionData);
             String transactionExchangeRatesTableDate = gateDate(fetchedTransactionData);
             String transactionExchangeRatesTransactionRate = getRate(fetchedTransactionData);
-            double calculatedTransactionValue = calculateAmount(transactionExchangeRatesTransactionRate);
+            double calculatedTransactionNetValue = calculateNetAmount(transactionExchangeRatesTransactionRate);
 
             String[] params;
-            double vat;
+
             DecimalFormat format = new DecimalFormat("###,##0.00");
 
             if (rbVAT.isSelected()) {
-                vat = calculateVAT(calculatedTransactionValue);
+                double calculatedTransactionVatValue = calculateVatAmount(transactionExchangeRatesTransactionRate);
+
                 params = new String[6];
-                params[5] = format.format(vat) + " zł";
+                params[5] = format.format(calculatedTransactionVatValue) + " zł";
             } else {
                 params = new String[5];
             }
@@ -173,7 +174,7 @@ public class MainWindowController implements Initializable {
             params[1] = transactionExchangeRatesTableNumber;
             params[2] = transactionExchangeRatesTableDate;
             params[3] = transactionExchangeRatesTransactionRate.replace(".", ",");
-            params[4] = format.format(calculatedTransactionValue) + " zł";
+            params[4] = format.format(calculatedTransactionNetValue) + " zł";
 
             if (rbPrint.isSelected()) {
                 ArrayList<String> labelText = generateLabel(params);
@@ -250,14 +251,15 @@ public class MainWindowController implements Initializable {
         return sRate;
     }
 
-    private double calculateAmount(String sRate) {
+    private double calculateNetAmount(String sRate) {
         return Math.round((Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
                 * Double.parseDouble(sRate)) * 100.00) / 100.00;
     }
 
-    private double calculateVAT(double calculatedTransactionValue) {
-        return (Double.parseDouble(cbVAT.getValue().replace("%", ""))
-                * calculatedTransactionValue) / 100;
+    private double calculateVatAmount(String sRate) {
+        return Math.round(Math.round(Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
+                * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100)
+                * Double.parseDouble(sRate) * 100.00) / 100.00;
     }
 
     private ArrayList<String> generateLabel(String[] args) {

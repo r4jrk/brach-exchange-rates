@@ -83,7 +83,7 @@ public class VAT {
     private void validateVatFileVatFormat() {
         for (int i = 1; i < vatFromFile.size(); i++) { //Start from int = 1 since 0 is a header
             String vatRateFromFile = vatFromFile.get(i);
-            if (vatRateFromFile != null && !vatRateFromFile.equals("")) {
+            if (vatRateFromFile != null && !vatRateFromFile.isEmpty()) {
                 if (!vatRateFromFile.matches("^\\d{1,2}%")) {
                     System.out.println("Stawka VAT ma niepoprawny format. Odczytana stawka: " + vatRateFromFile +
                             " spodziewany format: #%, gdzie '#' oznacza od jednej do dwóch cyfr");
