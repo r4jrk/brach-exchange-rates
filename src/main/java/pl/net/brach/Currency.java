@@ -83,7 +83,7 @@ public class Currency {
     private void validateCurrenciesFileCurrencyFormat() {
         for (int i = 1; i < currenciesFromFile.size(); i++) { //Start from int = 1 since 0 is a header
             String currencyFromFile = currenciesFromFile.get(i);
-            if (currencyFromFile != null && !currencyFromFile.equals("")) {
+            if (currencyFromFile != null && !currencyFromFile.isEmpty()) {
                 if (currencyFromFile.length() != 3) {
                     System.out.println("Waluta ma niepoprawny format. Odczytana waluta: " + currencyFromFile);
                 }
