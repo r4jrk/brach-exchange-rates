@@ -257,8 +257,8 @@ public class MainWindowController implements Initializable {
     }
 
     private double calculateVatAmount(String sRate) {
-        return Math.round(Math.round(Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
-                * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100)
+        return Math.round(Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
+                * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100
                 * Double.parseDouble(sRate) * 100.00) / 100.00;
     }
 
