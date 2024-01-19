@@ -29,6 +29,8 @@ public class MainWindowController implements Initializable {
     private static final List<String> DATA_FORMATS = Arrays.asList("dd-MM-yyyy", "dd/MM/yyyy", "ddMMyyyy", "dd.MM.yyyy",
             "yyyy-MM-dd", "yyyy/MM/dd", "yyyyMMdd", "yyyy.MM.dd");
 
+    private static final String[] ACCOUNTING_TYPES = {"W walucie", "W PLN"};
+
     private static final String NBP_API_LINK = "http://api.nbp.pl/api/exchangerates/rates/a/";
     private static final int NBP_API_RETRY_COUNT = 30;
     private static final DateTimeFormatter NBP_API_DATA_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
@@ -47,11 +49,14 @@ public class MainWindowController implements Initializable {
     private ComboBox<String> cbCurrencies;
     @FXML
     private ComboBox<String> cbVAT;
+    @FXML
+    private ComboBox<String> cbAccountingType;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         addCurrenciesToComboBox();
         addVATRatesToComboBox();
+        addAccountingTypesToComboBox();
 
         dpTransactionDate.getEditor().addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent keyEvent) -> {
             if (keyEvent.getCode() == KeyCode.DOWN) {
@@ -133,13 +138,24 @@ public class MainWindowController implements Initializable {
         cbVAT.getSelectionModel().selectFirst();
     }
 
+    private void addAccountingTypesToComboBox() {
+        cbAccountingType.getItems().clear();
+        cbAccountingType.getItems().addAll(ACCOUNTING_TYPES);
+        cbAccountingType.getSelectionModel().selectFirst();
+    }
+
     @FXML
-    private void currencyChosen() { cbCurrencies.getSelectionModel().select(cbCurrencies.getSelectionModel().getSelectedItem()); }
+    private void currencyChosen() {
+        cbCurrencies.getSelectionModel().select(cbCurrencies.getSelectionModel().getSelectedItem()); }
 
     @FXML
     private void vatRateChosen() {
         cbVAT.getSelectionModel().select(cbVAT.getSelectionModel().getSelectedItem());
     }
+
+    @FXML
+    private void accountingTypeChosen() {
+        cbAccountingType.getSelectionModel().select(cbAccountingType.getSelectionModel().getSelectedItem());}
 
     @FXML
     private void okClicked() throws IOException {
@@ -257,10 +273,16 @@ public class MainWindowController implements Initializable {
     }
 
     private double calculateVatAmount(String sRate) {
-        return Math.round(
-                Math.round(((Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
-                * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100) * 100.00)) / 100.00
-                * Double.parseDouble(sRate) * 100.00) / 100.00;
+        if (cbAccountingType.getSelectionModel().isSelected(0)) {
+            return Math.round(
+                    Math.round(((Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
+                            * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100) * 100.00)) / 100.00
+                            * Double.parseDouble(sRate) * 100.00) / 100.00;
+        } else {
+            return Math.round(Double.parseDouble(tbTransactionAmount.getText().replace(",", "."))
+                    * Double.parseDouble(cbVAT.getValue().replace("%", "")) / 100
+                    * Double.parseDouble(sRate) * 100.00) / 100.00;
+        }
     }
 
     private ArrayList<String> generateLabel(String[] args) {
